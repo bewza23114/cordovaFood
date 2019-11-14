@@ -1,0 +1,122 @@
+<ons-page id="orderconfirmationPage">
+    <ons-toolbar style="background-color:rgb(112, 103, 99);">
+        <div style="padding-left: 15px" class="left">
+            <i id="backbtn" class="fas fa-chevron-left color"></i>
+        </div>
+        <div class="center color">Order Confirmation</div>
+    </ons-toolbar>
+    <ons-card style="text-align: center;">
+        <img src="https://image.flaticon.com/icons/png/512/33/33059.png" alt="Onsen UI"
+            style="width: 30%">
+        <div id="restaurantname" class="head">
+            Restaurant
+        </div>
+        <div class="descript">
+            Your Oder is below
+            <hr>
+        </div>
+
+        <ons-row>
+            <ons-col width="20%">
+                <div class="bill">
+                    Quantity
+                </div>
+
+            </ons-col>
+            <ons-col width="65%">
+                <div class="bill">
+                    Name of Dish
+                </div>
+
+            </ons-col>
+            <ons-col>
+                <div class="bill">
+                    Price
+                </div>
+
+            </ons-col>
+        </ons-row>
+        <div id="order">
+            <ons-row>
+                <ons-col>
+                    <div class="order">
+                        
+                    </div>
+                </ons-col>
+                <ons-col>
+                    <div class="order">
+                        
+                    </div>
+                </ons-col>
+                <ons-col>
+                    <div class="order">
+                        
+                    </div>
+                </ons-col>
+            </ons-row>
+        </div>
+
+        <p style="background-color: rgb(184, 183, 182); padding: 10px; border-radius: 30px; font-weight: bold;">
+            Total : <span id="total">0</span>฿
+        </p>
+        <div
+            style="background-color: rgb(236, 236, 236); padding: 10px; border-radius: 30px; border-style: solid; border-color: rgb(202, 197, 197)">
+            Enter your Coupon if you have any
+        </div>
+        <p>
+            Pay via
+        </p>
+        <ons-button id="creditcard"
+            style="color:whitesmoke; background-color:rgb(85, 84, 83); border-radius: 30px; margin-bottom:8px; width:100%;">
+            Credit Card
+        </ons-button>
+        <ons-button
+            style="color:whitesmoke; background-color: rgb(66, 93, 216); border-radius: 30px;margin-bottom:8px; width:100%;">
+            PayPal
+        </ons-button>
+        <ons-button style="color:whitesmoke; background-color: rgb(37, 150, 37); border-radius: 30px; width:100%;">
+            Cash on Delivery
+        </ons-button>
+    </ons-card>
+    <style>
+        #mypage .page__background {
+            background-size: 360px 640px;
+            background-image: url('https://i.pinimg.com/originals/84/e9/f5/84e9f58267582abf22fa8d87ab43acba.jpg');
+            opacity: 0.4;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: "Times New Roman", Times, serif;
+        }
+
+        .card {
+            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+            background-color: rgba(230, 230, 230, 0.76);
+        }
+
+        .color {
+            color: whitesmoke;
+        }
+
+        .head {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .descript {
+            color: rgb(136, 127, 127);
+            font-size: 19px;
+        }
+
+        .bill {
+            color: rgb(136, 127, 127);
+            font-size: 12px;
+            padding-bottom: 6px;
+        }
+
+        .order {
+            font-size: 14px;
+        }
+    </style>
+</ons-page>
