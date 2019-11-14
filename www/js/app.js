@@ -41,6 +41,7 @@ document.addEventListener('init', function (event) {
     firebase.auth().signInWithPopup(provider).then(function (result) {
       var token = result.credential.accessToken;
       var user = result.user;
+      ons.notification.alert("Login Success!");
       $("#content")[0].load("foodcategory.html");
       // ...
     }).catch(function (error) {

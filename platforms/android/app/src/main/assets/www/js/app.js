@@ -21,12 +21,14 @@ firebase.auth().onAuthStateChanged(function (user) {
     console.log(email + " signed in");
     $("#loginbtn").hide();
     $("#logoutbtn").show();
+    $("#addressbtn").show();
   } else {
     localStorage.clear();
     console.log("Clear!!!!!!!!");
     console.log("signed out");
     $("#loginbtn").show();
     $("#logoutbtn").hide();
+    $("#addressbtn").hide();
   }
 });
 
@@ -39,6 +41,7 @@ document.addEventListener('init', function (event) {
     firebase.auth().signInWithPopup(provider).then(function (result) {
       var token = result.credential.accessToken;
       var user = result.user;
+      ons.notification.alert("Login Success!");
       $("#content")[0].load("foodcategory.html");
       // ...
     }).catch(function (error) {
@@ -144,6 +147,7 @@ document.addEventListener('init', function (event) {
   }
 
   if (page.id === 'restaurantmenuPage') {
+    console.log("restaurantmenuPage");
 
     var valueid = localStorage.getItem("curr_restid");
 
@@ -179,7 +183,6 @@ document.addEventListener('init', function (event) {
       console.log("Error getting cached document:", error);
     });
 
-    console.log("restaurantlistPage");
     $("#backbtn").click(function () {
       localStorage.clear();
       console.log("Clear!!!!!!!!");
@@ -188,8 +191,9 @@ document.addEventListener('init', function (event) {
     });
     $("#orderbtn").click(function () {
       console.log("click orderbtn")
-      $("#content")[0].load("orderconfirmation.html");
+       $("#content")[0].load("orderconfirmation.html");
     });
+
   }
   if (page.id === 'orderconfirmationPage') {
     console.log("orderconfirmationPage");
@@ -198,9 +202,17 @@ document.addEventListener('init', function (event) {
 
     if (order !== null) {
       $("#order").empty();
+      var lat = localStorage.getItem("lat");
+      var lng = localStorage.getItem("lng");
+      if(lat !== null){
+        $("#lat").text("Location : Latitude is "+lat);
+        $("#lng").text(" and Longitude is "+lng);
+      }else{
+        $("#lat").text("Please set your Location!")
+      }
+
       order.forEach(element => {
         var valueid = localStorage.getItem("curr_restid");
-
         var docRef = db.collection("restaurant").doc(valueid);
 
         docRef.get().then(function (doc) {
@@ -229,17 +241,34 @@ document.addEventListener('init', function (event) {
         $("#order").append(item);
       });
       $("#total").text(JSON.parse(localStorage.getItem("total")));
+    }else{
+      $("#lat").text("Please order Menu!")
     }
 
     var user = firebase.auth().currentUser;
 
     if (user) {
-      $("#creditcard").click(function () {
-        console.log("pay as credit");
-        localStorage.clear();
-        console.log("Clear!!!!!!!!");
-        $("#content")[0].load("foodcategory.html");
-      });
+      if(lat === null){
+        $("#creditcard").click(function () {
+          console.log("pay as credit");
+          ons.notification.alert("Please set your Location!");
+          $("#content")[0].load("foodcategory.html");
+        });
+      }else if(order !== null){
+        $("#creditcard").click(function () {
+          console.log("pay as credit");
+          localStorage.clear();
+          console.log("Clear!!!!!!!!");
+          ons.notification.alert("Your order will be delivered!");
+          $("#content")[0].load("foodcategory.html");
+        });
+      }else{
+        
+        $("#creditcard").click(function () {
+          ons.notification.alert("Please order Menu!");
+          $("#content")[0].load("foodcategory.html");
+        });
+      }
     } else {
       $("#content")[0].load("login.html");
     }
@@ -264,6 +293,7 @@ document.addEventListener('init', function (event) {
         console.log("Clear!!!!!!!!");
         $("#content")[0].load("foodcategory.html");
         $("#sidemenu")[0].close();
+        ons.notification.alert("You have been Logged out!")
       }).catch(function (error) {
         console.log(error.message);
       });
@@ -271,6 +301,11 @@ document.addEventListener('init', function (event) {
 
     $("#home").click(function () {
       $("#content")[0].load("foodcategory.html");
+      $("#sidemenu")[0].close();
+    });
+
+    $("#address").click(function () {
+      $("#content")[0].load("address.html");
       $("#sidemenu")[0].close();
     });
   }
@@ -282,10 +317,12 @@ document.addEventListener('init', function (event) {
       var username = $("#username").val();
       var password = $("#password").val();
       firebase.auth().signInWithEmailAndPassword(username, password).then(function () {
+        ons.notification.alert("Login Success!");
         $("#content")[0].load("foodcategory.html");
         $("#sidemenu")[0].close();
       }).catch(function (error) {
         console.log(error.message);
+        ons.notification.alert("Invalid ID or Password!");
       });
     });
     $("#createaccountbtn").click(function () {
@@ -301,6 +338,64 @@ document.addEventListener('init', function (event) {
       $("#content")[0].load("foodcategory.html");
     });
   }
+
+  if (page.id === 'addressPage') {
+    console.log("addressPage");
+
+    $("#backbtn").click(function () {
+      $("#content")[0].load("foodcategory.html");
+    });
+
+    var lat,selectedLat;
+    var lng,selectedLng;
+
+    var onSuccess = function (position) {
+      lat = position.coords.latitude;
+      lng = position.coords.longitude;
+      mapboxgl.accessToken = 'pk.eyJ1IjoiYmV3emEyMzExNCIsImEiOiJjazJsYWdoMmkwNTNlM2NwaGQyczlraGZxIn0.9v7TIpHOy-mPIplF210tCg';
+      var map = new mapboxgl.Map({
+        container: 'map', // container id
+        style: 'mapbox://styles/mapbox/streets-v11', // stylesheet location
+        center: [lng, lat], // starting position [lng, lat]
+        zoom: 14 // starting zoom
+      });
+
+      var marker = new mapboxgl.Marker({
+        draggable: true
+      })
+        .setLngLat([lng, lat])
+        .addTo(map);
+
+      function onDragEnd() {
+        var lngLat = marker.getLngLat();
+        selectedLat = lngLat.lat;
+        selectedLng = lngLat.lng;
+        coordinates.style.display = 'block';
+        coordinates.innerHTML = 'Longitude: ' + lngLat.lng + '<br />Latitude: ' + lngLat.lat;
+      }
+
+      marker.on('dragend', onDragEnd);
+    };
+
+    function onError(error) {
+      alert('code: ' + error.code + '\n' +
+        'message: ' + error.message + '\n');
+    }
+
+    navigator.geolocation.getCurrentPosition(onSuccess, onError);
+
+    $("#setAddress").click(function () {
+      console.log("Lat "+selectedLat,"Lng "+selectedLng);
+      if(selectedLat === undefined || selectedLng === undefined){
+        ons.notification.alert("Please set your Location!");
+      }else{
+        ons.notification.alert("Set Location to: " + selectedLat +","+ selectedLng);
+        localStorage.setItem("lat", selectedLat);
+        localStorage.setItem("lng", selectedLng);
+      }
+    });
+  }
+
   $("#registerbtn").click(function () {
     var email = document.getElementById('email').value;
     var password = document.getElementById('password').value;
